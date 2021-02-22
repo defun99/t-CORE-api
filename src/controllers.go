@@ -12,15 +12,12 @@ type IGetArticles interface {
 
 func GetArticles(c *gin.Context, searchQuery string, page string, pageSize string) {
 
-	articles, err := RetrieveArticleSearchResult(searchQuery, page, pageSize)
+	searchResult, err := RetrieveArticleSearchResult(searchQuery, page, pageSize)
 
 	if err != nil {
 		fmt.Println(err)
-	}
-	if articles == nil || len(articles) == 0 {
-		c.AbortWithStatus(http.StatusNotFound)
 	} else {
-		c.JSON(http.StatusOK, articles)
+		c.JSON(http.StatusOK, searchResult)
 		return
 	}
 }

@@ -17,9 +17,8 @@ func main() {
 			page := c.DefaultQuery("firstname", "1")
 			pageSize := c.DefaultQuery("pageSize", "1")
 			searchQuery := c.Query("query")
-			c.Header("Content-Type", "application/json; charset=utf-8")
 
-			go GetArticles(c, searchQuery, page, pageSize)
+			GetArticles(c, searchQuery, page, pageSize)
 		})
 	}
 

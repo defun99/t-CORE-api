@@ -26,7 +26,7 @@ func init() {
 	client = &http.Client{}
 }
 
-func RetrieveArticleSearchResult(searchQuery string, page string, pageSize string) ([]Article, error) {
+func RetrieveArticleSearchResult(searchQuery string, page string, pageSize string) (SearchResult, error) {
 
 	var searchResponse SearchResult
 	var articles []Article
@@ -42,7 +42,7 @@ func RetrieveArticleSearchResult(searchQuery string, page string, pageSize strin
 
 	req, err := http.NewRequest("GET", baseUrl, nil)
 	if err != nil {
-		return []Article{}, err
+		return SearchResult{}, err
 	}
 
 	q := req.URL.Query()
@@ -53,26 +53,27 @@ func RetrieveArticleSearchResult(searchQuery string, page string, pageSize strin
 
 	fmt.Println(req.URL)
 
+	req.Header.Add("Content-Type", "application/json; charset=utf-8")
+	req.Header.Add("Accept-Encoding", "gzip")
+	req.Header.Add("Content-Length", "6907")
 	resp, err := client.Do(req)
 
 	if err != nil {
-		return []Article{}, err
+		return SearchResult{}, err
 	}
 
-	// FIXME: revise serialisation process
-	defer resp.Body.Close()
-	content, _ := ioutil.ReadAll(resp.Body)
-
-	err = json.Unmarshal(content, &searchResponse)
+	content, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("error: ", err)
 	}
-	// !!!!
+	err = json.Unmarshal(content, &searchResponse)
+	resp.Body.Close()
 
-	articles = searchResponse.Data
-
+	if err != nil {
+		fmt.Println("error: ", err)
+	}
 	fmt.Println(searchResponse)
 	fmt.Println(articles)
 
-	return articles, nil
+	return searchResponse, nil
 }
